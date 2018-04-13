@@ -20,7 +20,9 @@ from keras.preprocessing.image import ImageDataGenerator
 
 
 def create_generators(datafolder, batch_size=8, shuffle=True, normalize=True):
-    """
+    """ output of generator are tuples of (images, targets) where dimensions are as follows:
+        images.shape = (batch_size, height, width, channels)
+        targets.shape = (batch_size, height, width, channels)
 
     :param datafolder: path to folder with dicom and contourfile folders
     :param batch_size: number of images in each batch outputted by generator
@@ -37,7 +39,7 @@ def create_generators(datafolder, batch_size=8, shuffle=True, normalize=True):
     images = images[..., np.newaxis]
 
     # usually no standard deviation normalization for images
-    images = images.astype('float64')
+    images = images.astype('float32')
     if normalize:
         images -= np.mean(images, axis=(1, 2), keepdims=True)
 

@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from .. import load_data
+import load_data
 
 class TestLoadData(unittest.TestCase):
 

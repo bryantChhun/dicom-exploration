@@ -5,7 +5,7 @@ created in PyCharm and executable as run-debug
 
 import unittest
 import numpy as np
-from .. import feed_data
+import feed_data
 
 class TestCreateGenerators(unittest.TestCase):
     """

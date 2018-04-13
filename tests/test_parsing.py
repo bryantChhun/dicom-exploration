@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from .. import parsing
+import parsing
 
 class TestParsing(unittest.TestCase):
 
