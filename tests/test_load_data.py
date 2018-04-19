@@ -38,14 +38,18 @@ class TestLoadData(unittest.TestCase):
 
 
     def test_load_all_patients(self):
-        imgs, msks = load_data.load_all_patients(data_dir='../test_data')
-        self.assertEqual(len(imgs), len(msks))
+        imgs, i_msks, o_msks = load_data.load_all_patients(data_dir='../test_data')
+        self.assertEqual(len(imgs), len(i_msks))
+        self.assertEqual(len(imgs), len(o_msks))
         self.assertEqual(len(imgs), 36)
-        self.assertEqual(len(msks), 36)
+        self.assertEqual(len(i_msks), 36)
+        self.assertEqual(len(o_msks), 36)
         self.assertEqual(type(imgs[0]), np.ndarray)
-        self.assertEqual(type(msks[0]), np.ndarray)
         self.assertEqual(imgs[0].dtype, 'int16')
-        self.assertEqual(msks[0].dtype, 'bool')
+        self.assertEqual(type(next(item for item in i_msks if item is not None)), np.ndarray)
+        self.assertEqual(type(next(item for item in o_msks if item is not None)), np.ndarray)
+        self.assertEqual(next(item for item in i_msks if item is not None).dtype, 'bool')
+        self.assertEqual(next(item for item in o_msks if item is not None).dtype, 'bool')
 
 
 if __name__ == '__main__':

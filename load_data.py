@@ -25,6 +25,11 @@ class PatientData(object):
     Object for each patient.
     "labeled_dicoms" and "all_dicoms" properties contain image and mask information.
 
+    self.data is a list of tuples of:
+        (image_index, image, boolean inner-contour, boolean outer-contour)
+
+    self.labeled is a list of image_index for which images have labels
+
     Data directory structure:
     directory = "./final_data"
         directory/contourfiles
@@ -103,6 +108,7 @@ class PatientData(object):
     def load_contours(self, filename, width, height):
         """ check if contour exists, loads it, converts to binary mask
             if mask doesn't exist, returns None
+
         :param filename: path to patient's contour folder
         :param width: width of matching dicom image
         :param height: height of matching dicom image
@@ -120,6 +126,7 @@ class PatientData(object):
     def labeled_dicoms(self):
         """ removes (images, mask) groups that have None for mask
             indicies in self.labeled are based on file name, not list indices (start at 1 not 0).
+
         :return: list of tuples: (images, i-mask, o-mask)
         """
         return [sorted(self.data)[i-1][1:] for i in self.labeled]
@@ -127,37 +134,43 @@ class PatientData(object):
     @property
     def all_dicoms(self):
         """ returns all data from self.data, but removes index from first element
+
         :return: list of tuples: (images, i-mask, o-mask)
         """
         return [dcm_ctr_pair[1:] for dcm_ctr_pair in self.data]
 
 
-def load_all_patients(data_dir, inner_outer='inner'):
+def load_all_patients(data_dir, inner_outer='both', labeled_only=True):
     """  Parses link.csv to match dicoms with contours
          iterates through all patients and appends to list
-         returns ONLY dicoms that have masks
+
 
     :param data_dir: folder that contains "dicoms", "contourfiles" folders and link.csv
     :param inner_outer: whether to consider 'inner', 'outer', or 'both' contour masks
-    :return: list of dicom images, list of inner_contour binary masks
+    :return: list of dicom images, list of boolean inner-contours, list of boolean outer-contour
+             note: None can exist in list of contours
     """
 
     pat_lst = parsing.parse_patient_csv(data_dir+'/link.csv')
 
     images_masks = []
+    # first row of pat_lst is a header
     for patient in pat_lst[1:]:
 
         dicom_dir = data_dir +"/dicoms/"+ patient[0]
         contour_dir = data_dir +"/contourfiles/"+ patient[1]
 
         pat = PatientData(dicom_dir, contour_dir, inner_outer=inner_outer)
-        images_masks += pat.labeled_dicoms
+        if labeled_only:
+            images_masks += pat.labeled_dicoms
+        else:
+            images_masks += pat.all_dicoms
 
-    # p.labeled_dicoms returns up to three elements: image, inner_mask, outer_mask
-    # for now, we ignore outer_mask
-    images, inner_masks, _ = zip(*images_masks)
+    # images_masks is a list of three elements: image, inner_mask, outer_mask
+    images, inner_masks, outer_masks = zip(*images_masks)
 
-    return list(images), list(inner_masks)
+    return list(images), list(inner_masks), list(outer_masks)
+
 
 def write_all_patients():
     """ if load_data called from command line, this method will
@@ -169,12 +182,14 @@ def write_all_patients():
     data_dir = sys.argv[1]
     output_dir = sys.argv[2]
 
-    imgs, msks = load_all_patients(data_dir=data_dir)
+    imgs, i_msks, o_msks = load_all_patients(data_dir=data_dir)
 
     for idx, array in enumerate(imgs):
         np.save(output_dir+'/img_'+str(idx), array)
-    for idx, array in enumerate(msks):
-        np.save(output_dir+'/msk_'+str(idx), array)
+    for idx, array in enumerate(i_msks):
+        np.save(output_dir+'/i_msk_'+str(idx), array)
+    for idx, array in enumerate(o_msks):
+        np.save(output_dir + '/o_msk_' + str(idx), array)
 
     return None
 
