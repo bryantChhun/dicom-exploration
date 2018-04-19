@@ -16,7 +16,6 @@ Do you think that any other heuristic (non-machine learning)-based approaches, b
 
 
 ========================================================================================
-========================================================================================
 # dicoms
 
 This repo contains methods for parsing MRI Dicom files, corresponding segmentation masks, and methods to stream this data into a DL training pipeline
