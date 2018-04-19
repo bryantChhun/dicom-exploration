@@ -6,6 +6,7 @@ After building the pipeline, please discuss any changes that you made to the pip
 
 	- Because my part 1 approach already included flags to parse o-contours, there was not much additional coding needed
 	- only minor changes to load_data method were made, and a few other comments clarified
+	- load_all_patients in the load_data script now returns both sets of contours!
 	
 	
 Let’s assume that you want to create a system to outline the boundary of the blood pool (i-contours), and you already know the outer border of the heart muscle (o-contours). Compare the differences in pixel intensities inside the blood pool (inside the i-contour) to those inside the heart muscle (between the i-contours and o-contours); could you use a simple thresholding scheme to automatically create the i-contours, given the o-contours? Why or why not? Show figures that help justify your answer.
